@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 1. GOOGLE SEO META TAGS ESSENCIAIS -->
+    <title>ClimaBrasil | Previsão do Tempo 7 Dias por Cidade e CEP - Franklin Martins</title>
+    <meta name="description" content="Consulte em clima.franklem.com a previsão do tempo para os próximos 7 dias em qualquer cidade ou CEP do Brasil. Temperatura, chuva, umidade e dicas de saúde por Franklin Martins.">
+    <meta name="author" content="Franklin Martins">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <link rel="canonical" href="https://clima.franklem.com/">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- 2. OPEN GRAPH / WHATSAPP -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="ClimaBrasil (clima.franklem.com)">
+    <meta property="og:title" content="ClimaBrasil | Previsão do Tempo 7 Dias no Brasil (Cidade ou CEP)">
+    <meta property="og:description" content="Veja o clima atual, previsão de 7 dias, índice de chuva, fases da lua e dicas de saúde em clima.franklem.com por Franklin Martins.">
+    <meta property="og:url" content="https://clima.franklem.com/">
+
+    <!-- 3. PRECONNECT APENAS PARA AS APIS ESSENCIAIS DE CLIMA (Otimiza Network Dependency Tree) -->
+    <link rel="preconnect" href="https://api.open-meteo.com" crossorigin>
+    <link rel="dns-prefetch" href="https://geocoding-api.open-meteo.com">
+    <link rel="dns-prefetch" href="https://brasilapi.com.br">
+
+    <!-- 4. DADOS ESTRUTURADOS JSON-LD (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://clima.franklem.com/#webapp",
+          "name": "ClimaBrasil - Previsão do Tempo no Brasil",
+          "url": "https://clima.franklem.com/",
+          "description": "Aplicação web Mobile-First de previsão do tempo para 7 dias exclusiva para cidades e CEPs do Brasil, com dicas de saúde e fases da lua.",
+          "applicationCategory": "WeatherApplication",
+          "operatingSystem": "All",
+          "inLanguage": "pt-BR",
+          "isAccessibleForFree": true,
+          "areaServed": {
+            "@type": "Country",
+            "name": "Brasil"
+          },
+          "author": {
+            "@type": "Person",
+            "@id": "https://franklem.com/#franklin",
+            "name": "Franklin Martins",
+            "url": "https://franklem.com/",
+            "sameAs": [
+              "https://franklem.com/",
+              "https://blog.franklem.com/",
+              "https://clima.franklem.com/"
+            ]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://clima.franklem.com/#website",
+          "name": "ClimaBrasil por Franklin Martins",
+          "url": "https://clima.franklem.com/",
+          "publisher": {
+            "@id": "https://franklem.com/#franklin"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://clima.franklem.com/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- 5. CSS CRÍTICO PURO EMBUTIDO (Zero Render-Blocking, Zero Unused CSS, System Font Stack) -->
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-dark: #0f172a;
+            --bg-mid: #1e3a8a;
+            --bg-light: #1e40af;
+            --glass: rgba(255, 255, 255, 0.09);
+            --glass-border: rgba(255, 255, 255, 0.16);
+            --text-main: #f8fafc;
+            --text-muted: #bfdbfe;
+            --cyan: #22d3ee;
+            --cyan-dark: #0891b2;
+            --emerald: #34d399;
+            --amber: #fcd34d;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-light) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 3rem;
+        }
+        a { color: inherit; text-decoration: none; }
+        button, input { font: inherit; }
+        .container { max-width: 48rem; margin: 0 auto; padding: 0 1rem; }
+        .topbar {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .topbar-inner {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem; max-width: 48rem; margin: 0 auto;
+        }
+        .brand { display: flex; align-items: center; gap: 0.65rem; }
+        .brand-logo {
+            width: 2.25rem; height: 2.25rem; border-radius: 0.75rem;
+            background: linear-gradient(135deg, #60a5fa, var(--cyan));
+            color: #0f172a; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(34, 211, 238, 0.25);
+        }
+        .brand-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; line-height: 1.2; }
+        .badge-br {
+            font-size: 0.625rem; font-weight: 700; text-transform: uppercase;
+            padding: 0.1rem 0.35rem; border-radius: 0.25rem;
+            background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        .brand-sub { font-size: 0.7rem; color: var(--text-muted); }
+        .brand-sub a { text-decoration: underline; font-weight: 600; }
+        .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .btn-ghost {
+            font-size: 0.75rem; background: rgba(255, 255, 255, 0.1); color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 0.5rem;
+            padding: 0.45rem 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;
+            transition: background 0.15s;
+        }
+        .btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+        .btn-primary-link {
+            font-size: 0.75rem; font-weight: 600; color: #0f172a;
+            background: linear-gradient(90deg, #38bdf8, var(--cyan));
+            padding: 0.45rem 0.75rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem;
+        }
+        main.container { padding-top: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+        }
+        .status-banner {
+            display: none; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; font-weight: 500;
+        }
+        .status-banner.show { display: flex; }
+        .status-info { background: rgba(8, 51, 68, 0.85); border: 1px solid rgba(34, 211, 238, 0.4); color: #cffafe; }
+        .status-error { background: rgba(69, 10, 10, 0.85); border: 1px solid rgba(248, 113, 113, 0.4); color: #fecaca; }
+
+        /* Hero Clima Atual (LCP otimizado com altura mínima fixa para CLS = 0) */
+        .hero-top {
+            display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;
+            min-height: 108px;
+        }
+        @media (min-width: 640px) {
+            .hero-top { flex-direction: row; align-items: center; }
+            .glass-card { padding: 1.5rem; }
+        }
+        .loc-pill {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.75rem; font-weight: 600; color: #67e8f9;
+            background: rgba(8, 51, 68, 0.65); border: 1px solid rgba(6, 182, 212, 0.35);
+            padding: 0.25rem 0.65rem; border-radius: 999px; margin-bottom: 0.5rem;
+        }
+        .city-title { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; line-height: 1.15; }
+        @media (min-width: 640px) { .city-title { font-size: 2rem; } }
+        .date-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; text-transform: capitalize; }
+
+        .temp-block { display: flex; align-items: center; gap: 1rem; }
+        .weather-big-icon { width: 3.75rem; height: 3.75rem; display: flex; align-items: center; justify-content: center; color: var(--amber); flex-shrink: 0; }
+        .temp-row { display: flex; align-items: flex-start; line-height: 1; }
+        .temp-value { font-size: 3.25rem; font-weight: 800; letter-spacing: -0.04em; }
+        .temp-unit { font-size: 1.4rem; font-weight: 600; color: var(--text-muted); margin-top: 0.25rem; }
+        .weather-desc { font-size: 0.85rem; font-weight: 600; color: #e0f2fe; margin-top: 0.2rem; }
+        .apparent-text { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Grid 2x2 / 4x1 de Métricas */
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+            margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.14);
+        }
+        @media (min-width: 640px) { .metrics-grid { grid-template-columns: repeat(4, 1fr); } }
+        .metric-box {
+            background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem; padding: 0.75rem; display: flex; align-items: center; gap: 0.65rem;
+            min-height: 66px;
+        }
+        .metric-icon {
+            width: 2.35rem; height: 2.35rem; border-radius: 0.65rem;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .metric-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+        .metric-val { font-size: 1.05rem; font-weight: 700; color: #fff; }
+
+        /* Dica de Saúde */
+        .health-box {
+            margin-top: 1rem; border-radius: 1rem; padding: 0.85rem 1rem;
+            background: rgba(6, 78, 59, 0.55); border: 1px solid rgba(52, 211, 153, 0.32);
+            display: flex; align-items: flex-start; gap: 0.75rem; min-height: 68px;
+        }
+        .health-icon {
+            width: 2rem; height: 2rem; border-radius: 0.5rem;
+            background: rgba(16, 185, 129, 0.2); color: #6ee7b7;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem;
+        }
+        .health-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6ee7b7; display: block; }
+        .health-text { font-size: 0.78rem; color: #ecfdf5; margin-top: 0.1rem; }
+
+        /* Pesquisa */
+        .search-label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .search-form { display: flex; gap: 0.5rem; }
+        .search-input {
+            flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fff; border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; outline: none;
+        }
+        .search-input::placeholder { color: rgba(191, 219, 254, 0.55); }
+        .search-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3); }
+        .search-btn {
+            background: var(--cyan); color: #0f172a; font-weight: 700; font-size: 0.875rem;
+            border: none; border-radius: 0.75rem; padding: 0.75rem 1.2rem; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0;
+        }
+        .search-btn:hover { background: #67e8f9; }
+        .quick-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-top: 0.65rem; font-size: 0.7rem; color: var(--text-muted); }
+        .quick-chip {
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #e0f2fe; border-radius: 0.35rem; padding: 0.18rem 0.5rem; cursor: pointer; font-size: 0.7rem;
+        }
+        .quick-chip:hover { background: rgba(255, 255, 255, 0.18); }
+
+        /* Previsão 7 Dias (CLS = 0 com altura reservada) */
+        .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+        .section-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #e0f2fe; display: flex; align-items: center; gap: 0.45rem; }
+        .forecast-list { min-height: 336px; display: flex; flex-direction: column; }
+        .forecast-row {
+            min-height: 48px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0.55rem 0.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.09); font-size: 0.82rem;
+        }
+        .forecast-row:last-child { border-bottom: none; }
+        .f-day { width: 6.5rem; font-weight: 600; text-transform: capitalize; color: #fff; }
+        .f-cond { display: flex; align-items: center; gap: 0.5rem; flex: 1; color: #dbeafe; }
+        .f-cond-text { display: none; }
+        @media (min-width: 520px) { .f-cond-text { display: inline; } }
+        .f-right { display: flex; align-items: center; gap: 0.85rem; }
+        .f-rain { color: #67e8f9; font-weight: 600; width: 3.2rem; text-align: right; font-size: 0.78rem; }
+        .f-temps { width: 5.5rem; text-align: right; font-weight: 600; }
+
+        /* Grid Lua + Compartilhar */
+        .dual-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 640px) { .dual-grid { grid-template-columns: 1fr 1fr; } }
+        .moon-card { display: flex; align-items: center; gap: 1rem; min-height: 96px; }
+        .moon-icon-wrap {
+            width: 3.5rem; height: 3.5rem; border-radius: 1rem;
+            background: rgba(30, 27, 75, 0.8); border: 1px solid rgba(129, 140, 248, 0.3);
+            display: flex; align-items: center; justify-content: center; color: var(--amber); flex-shrink: 0;
+        }
+        .btn-whatsapp {
+            margin-top: 0.75rem; width: 100%;
+            background: rgba(16, 185, 129, 0.22); border: 1px solid rgba(52, 211, 153, 0.4);
+            color: #a7f3d0; font-size: 0.78rem; font-weight: 600; padding: 0.6rem 1rem;
+            border-radius: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+        }
+        .btn-whatsapp:hover { background: rgba(16, 185, 129, 0.32); }
+
+        /* Iframe container com carregamento adiado para proteger LCP no celular */
+        .iframe-box {
+            width: 100%; height: 420px; border-radius: 1rem; overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.18); background: #0f172a; position: relative;
+        }
+        .iframe-placeholder {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.8rem;
+        }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 0.65rem; }
+        .footer-pill {
+            font-size: 0.75rem; font-weight: 600; padding: 0.45rem 0.9rem; border-radius: 0.65rem;
+            background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .svg-icon { width: 1.15em; height: 1.15em; fill: currentColor; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Branding Bar -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <a href="https://clima.franklem.com" class="brand-logo" aria-label="Início ClimaBrasil">
+                    <svg class="svg-icon" style="width:1.35rem;height:1.35rem;" viewBox="0 0 24 24"><path d="M6.5 20Q4.22 20 2.61 18.43 1 16.85 1 14.58 1 12.63 2.17 11.1 3.35 9.57 5.25 9.15 5.88 6.85 7.75 5.43 9.63 4 12 4 14.93 4 16.96 6.04 19 8.07 19 11 20.73 11.2 21.86 12.5 23 13.78 23 15.5 23 17.38 21.69 18.69 20.38 20 18.5 20Z"/></svg>
+                </a>
+                <div>
+                    <h1 class="brand-title">
+                        <span>ClimaBrasil</span>
+                        <span class="badge-br">BR</span>
+                    </h1>
+                    <p class="brand-sub">Por <a href="https://franklem.com" target="_blank" rel="noopener noreferrer">Franklin Martins</a></p>
+                </div>
+            </div>
+
+            <nav class="nav-actions" aria-label="Ações principais">
+                <button id="btn-geo" type="button" class="btn-ghost" title="Usar minha localização GPS">
+                    <svg class="svg-icon" style="color:var(--cyan)" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19a7 7 0 1 1 0-14 7 7 0 0 1 0 14z"/></svg>
+                    <span>Meu Local</span>
+                </button>
+                <a href="https://franklem.com" target="_blank" rel="noopener noreferrer" class="btn-primary-link">
+                    <span>franklem.com</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Aviso / Status -->
+        <div id="status-banner" role="status" aria-live="polite" class="status-banner status-info">
+            <span id="status-text">Carregando...</span>
+            <button type="button" aria-label="Fechar aviso" onclick="document.getElementById('status-banner').classList.remove('show')" style="background:none;border:none;color:inherit;cursor:pointer;font-weight:700;">✕</button>
+        </div>
+
+        <!-- 1. CARD PRINCIPAL DE CLIMA (LCP Instantâneo com dados iniciais pré-renderizados) -->
+        <section aria-labelledby="city-name" class="glass-card">
+            <div class="hero-top">
+                <div>
+                    <div class="loc-pill">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                        <span id="location-badge">Localização no Brasil</span>
+                    </div>
+                    <h2 id="city-name" class="city-title">Ribeirão Preto, SP</h2>
+                    <p id="current-date" class="date-text">Sexta-feira, Brasil</p>
+                </div>
+
+                <div class="temp-block">
+                    <div id="weather-icon-main" class="weather-big-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="54" height="54" fill="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v3m0 16v3M4.22 4.22l2.12 2.12m11.32 11.32 2.12 2.12M1 12h3m16 0h3M4.22 19.78l2.12-2.12m11.32-11.32 2.12-2.12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                        <div class="temp-row">
+                            <span id="current-temp" class="temp-value">28</span>
+                            <span class="temp-unit">°C</span>
+                        </div>
+                        <p id="weather-desc" class="weather-desc">Céu limpo</p>
+                        <p class="apparent-text">Sensação: <strong id="apparent-temp" style="color:#fff">29°C</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de Métricas -->
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-icon" style="background:rgba(59,130,246,0.2);color:#93c5fd;">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="metric-label">Umidade</p>
+                        <p id="current-humidity" class="metric-val">48%</p>
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-icon" style="background:rgba(6,182,212,0.2);color:#67e8f9;">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 0-9 9h8v8a2 2 0 0 0 4 0v-1h-2v1a0 0 0 0 1 0 0v-8h8a9 9 0 0 0-9-9z"/></svg>
+                    </div>
+                    <div>
+                        <p class="metric-label">Chuva Hoje</p>
+                        <p id="current-rain-prob" class="metric-val">10%</p>
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-icon" style="background:rgba(20,184,166,0.2);color:#5eead4;">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 10h13a3 3 0 1 0-3-3M2 14h16a3 3 0 1 1-3 3M4 18h9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                        <p class="metric-label">Vento</p>
+                        <p id="current-wind" class="metric-val">12 km/h</p>
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-icon" style="background:rgba(168,85,247,0.2);color:#d8b4fe;">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V14h-2v2.93A8 8 0 0 1 4.07 11H7V9H4.07A8 8 0 0 1 11 4.07V7h2V4.07A8 8 0 0 1 19.93 9H17v2h2.93A8 8 0 0 1 13 16.93z"/></svg>
+                    </div>
+                    <div>
+                        <p class="metric-label">Pressão</p>
+                        <p id="current-pressure" class="metric-val">1013 hPa</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dica de Saúde -->
+            <div class="health-box">
+                <div class="health-icon" aria-hidden="true">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div>
+                    <span class="health-title">Dica de Saúde & Bem-Estar</span>
+                    <p id="health-tip-text" class="health-text">Hidrate-se regularmente ao longo do dia e acompanhe os indicadores de umidade e temperatura da sua região.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. CAMPO DE PESQUISA POR CIDADE OU CEP -->
+        <section aria-label="Pesquisar previsão por Cidade ou CEP" class="glass-card" style="padding: 1.1rem 1.25rem;">
+            <label for="search-input" class="search-label">Pesquisar outra Cidade ou CEP (Apenas Brasil)</label>
+            <form id="search-form" role="search" action="https://clima.franklem.com/" method="GET" class="search-form">
+                <input 
+                    type="search" 
+                    id="search-input" 
+                    name="q"
+                    autocomplete="postal-code"
+                    placeholder="Ex: Ribeirão Preto, Curitiba ou 01001-000" 
+                    class="search-input"
+                    required
+                >
+                <button type="submit" id="search-btn" class="search-btn">
+                    <span>Buscar</span>
+                </button>
+            </form>
+            <div class="quick-tags">
+                <span>Testes rápidos:</span>
+                <button type="button" onclick="quickSearch('01001-000')" class="quick-chip">CEP: 01001-000</button>
+                <button type="button" onclick="quickSearch('Ribeirão Preto')" class="quick-chip">Ribeirão Preto</button>
+                <button type="button" onclick="quickSearch('Gramado')" class="quick-chip">Gramado</button>
+                <button type="button" onclick="quickSearch('Manaus')" class="quick-chip">Manaus</button>
+            </div>
+        </section>
+
+        <!-- 3. PREVISÃO DOS PRÓXIMOS 7 DIAS -->
+        <section aria-labelledby="heading-7days" class="glass-card">
+            <div class="section-head">
+                <h3 id="heading-7days" class="section-title">Previsão para os Próximos 7 Dias</h3>
+                <span style="font-size:0.7rem;color:var(--text-muted);">Chuva (%) • Mín / Máx</span>
+            </div>
+
+            <div id="forecast-list" class="forecast-list">
+                <div class="forecast-row"><span class="f-day">Hoje</span><span class="f-cond">Atualizando...</span><span class="f-temps">19° / 29°C</span></div>
+                <div class="forecast-row"><span class="f-day">Dia 2</span><span class="f-cond">Atualizando...</span><span class="f-temps">20° / 30°C</span></div>
+                <div class="forecast-row"><span class="f-day">Dia 3</span><span class="f-cond">Atualizando...</span><span class="f-temps">19° / 28°C</span></div>
+                <div class="forecast-row"><span class="f-day">Dia 4</span><span class="f-cond">Atualizando...</span><span class="f-temps">18° / 27°C</span></div>
+                <div class="forecast-row"><span class="f-day">Dia 5</span><span class="f-cond">Atualizando...</span><span class="f-temps">19° / 29°C</span></div>
+                <div class="forecast-row"><span class="f-day">Dia 6</span><span class="f-cond">Atualizando...</span><span class="f-temps">20° / 31°C</span></div>
+                <div class="forecast-row"><span class="f-day">Dia 7</span><span class="f-cond">Atualizando...</span><span class="f-temps">21° / 30°C</span></div>
+            </div>
+        </section>
+
+        <!-- 4. FASES DA LUA E COMPARTILHAMENTO -->
+        <section aria-label="Astronomia e Compartilhamento" class="dual-grid">
+            <div class="glass-card moon-card">
+                <div class="moon-icon-wrap" aria-hidden="true">
+                    <svg class="svg-icon" style="width:1.8rem;height:1.8rem;" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+                </div>
+                <div>
+                    <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#a5b4fc;display:block;">Astronomia Hoje</span>
+                    <h3 id="moon-phase-name" style="font-size:1rem;font-weight:700;color:#fff;margin-top:0.15rem;">Fase Lunar</h3>
+                    <p id="moon-illumination" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem;">Iluminação: --%</p>
+                </div>
+            </div>
+
+            <div class="glass-card" style="display:flex;flex-direction:column;justify-content:space-between;min-height:96px;">
+                <div>
+                    <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--cyan);display:block;">Compartilhar Boletim</span>
+                    <p style="font-size:0.75rem;color:#e0f2fe;margin-top:0.2rem;">Envie o resumo de <strong>clima.franklem.com</strong> com a dica de saúde no WhatsApp.</p>
+                </div>
+                <button id="btn-share" type="button" class="btn-whatsapp">
+                    <span>Compartilhar Previsão no WhatsApp</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 5. IFRAME DO BLOG DE NOTÍCIAS (Carregado de forma diferida para não travar o LCP Mobile) -->
+        <section aria-labelledby="heading-blog" class="glass-card">
+            <div class="section-head" style="flex-wrap:wrap;gap:0.5rem;">
+                <div>
+                    <h3 id="heading-blog" class="section-title">Últimas Notícias & Conteúdos</h3>
+                    <p style="font-size:0.75rem;color:var(--text-muted);">Acompanhe as atualizações de <strong>blog.franklem.com</strong></p>
+                </div>
+                <a href="https://blog.franklem.com" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem;color:var(--cyan);text-decoration:underline;">
+                    Abrir blog.franklem.com em nova guia ↗
+                </a>
+            </div>
+
+            <div id="blog-container" class="iframe-box">
+                <div id="blog-placeholder" class="iframe-placeholder">
+                    <span>Carregando portal de notícias blog.franklem.com...</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé Semântico -->
+    <footer class="container" style="margin-top: 2rem;">
+        <div class="glass-card" style="text-align:center;">
+            <p style="font-size:0.9rem;font-weight:600;color:#fff;">
+                Aplicação desenvolvida por <span style="color:var(--cyan);font-weight:700;">Franklin Martins</span>
+            </p>
+            <div class="footer-links">
+                <a href="https://clima.franklem.com" class="footer-pill" style="border-color:rgba(34,211,238,0.4);color:#cffafe;">clima.franklem.com</a>
+                <a href="https://franklem.com" target="_blank" rel="noopener noreferrer" class="footer-pill">franklem.com</a>
+                <a href="https://blog.franklem.com" target="_blank" rel="noopener noreferrer" class="footer-pill">blog.franklem.com</a>
+            </div>
+            <p style="font-size:0.68rem;color:rgba(191,219,254,0.6);margin-top:0.75rem;">
+                Dados meteorológicos: Open-Meteo & BrasilAPI • Otimizado para Google Core Web Vitals
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const APP_BASE_URL = "https://clima.franklem.com";
+
+        // Ícones SVG leves inline para evitar qualquer download de fonte externa
+        const svgIcons = {
+            sun: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="#fcd34d"><circle cx="12" cy="12" r="5"/><path d="M12 1v3m0 16v3M4.22 4.22l2.12 2.12m11.32 11.32 2.12 2.12M1 12h3m16 0h3M4.22 19.78l2.12-2.12m11.32-11.32 2.12-2.12" stroke="#fcd34d" stroke-width="2" stroke-linecap="round"/></svg>',
+            cloudSun: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="#93c5fd"><circle cx="8" cy="9" r="3.5" fill="#fcd34d"/><path d="M8.5 19H18a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 9 10a4 4 0 0 0-.5 7.97Z"/></svg>',
+            cloud: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="#cbd5e1"><path d="M6.5 19Q4.22 19 2.61 17.43 1 15.85 1 13.58 1 11.63 2.17 10.1 3.35 8.57 5.25 8.15 5.88 5.85 7.75 4.43 9.63 3 12 3 14.93 3 16.96 5.04 19 7.07 19 10 20.73 10.2 21.86 11.5 23 12.78 23 14.5 23 16.38 21.69 17.69 20.38 19 18.5 19Z"/></svg>',
+            rain: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="#60a5fa"><path d="M6.5 16Q4.22 16 2.61 14.43 1 12.85 1 10.58 1 8.63 2.17 7.1 3.35 5.57 5.25 5.15 5.88 2.85 7.75 1.43 9.63 0 12 0 14.93 0 16.96 2.04 19 4.07 19 7 20.73 7.2 21.86 8.5 23 9.78 23 11.5 23 13.38 21.69 14.69 20.38 16 18.5 16Z"/><path d="M8 18l-1.5 4M12 18l-1.5 4M16 18l-1.5 4" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/></svg>',
+            storm: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="#fbbf24"><path d="M6.5 16h12a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.5-1.5A4.5 4.5 0 0 0 6.5 16z" fill="#94a3b8"/><path d="M13 13l-4 6h4l-1 5 5-7h-4l1-4z"/></svg>'
+        };
+
+        const weatherCodeMap = {
+            0: { desc: "Céu limpo", svg: svgIcons.sun },
+            1: { desc: "Predominantemente limpo", svg: svgIcons.cloudSun },
+            2: { desc: "Parcialmente nublado", svg: svgIcons.cloudSun },
+            3: { desc: "Encoberto", svg: svgIcons.cloud },
+            45: { desc: "Nevoeiro", svg: svgIcons.cloud },
+            48: { desc: "Nevoeiro com geada", svg: svgIcons.cloud },
+            51: { desc: "Garoa leve", svg: svgIcons.rain },
+            53: { desc: "Garoa moderada", svg: svgIcons.rain },
+            55: { desc: "Garoa intensa", svg: svgIcons.rain },
+            61: { desc: "Chuva fraca", svg: svgIcons.rain },
+            63: { desc: "Chuva moderada", svg: svgIcons.rain },
+            65: { desc: "Chuva forte", svg: svgIcons.rain },
+            80: { desc: "Pancadas de chuva leves", svg: svgIcons.rain },
+            81: { desc: "Pancadas de chuva moderadas", svg: svgIcons.rain },
+            82: { desc: "Pancadas de chuva fortes", svg: svgIcons.rain },
+            95: { desc: "Tempestade com trovoadas", svg: svgIcons.storm },
+            96: { desc: "Tempestade com granizo", svg: svgIcons.storm },
+            99: { desc: "Tempestade severa", svg: svgIcons.storm }
+        };
+
+        let lastLoadedWeather = { city: "Ribeirão Preto, SP", temp: 28, rain: 10, humidity: 48, desc: "Céu limpo" };
+        let activeAbortController = null;
+
+        function getWeatherInfo(code) {
+            return weatherCodeMap[code] || { desc: "Condição variável", svg: svgIcons.cloudSun };
+        }
+
+        function showStatus(msg, isError = false) {
+            const banner = document.getElementById('status-banner');
+            const text = document.getElementById('status-text');
+            banner.className = `status-banner show ${isError ? 'status-error' : 'status-info'}`;
+            text.textContent = msg;
+            if (!isError) {
+                setTimeout(() => banner.classList.remove('show'), 4000);
+            }
+        }
+
+        function calculateMoonPhase(date = new Date()) {
+            const lp = 2551443;
+            const now = date.getTime() / 1000;
+            const newMoonRef = new Date(Date.UTC(1970, 0, 7, 20, 35, 0)).getTime() / 1000;
+            const phase = ((now - newMoonRef) % lp) / lp;
+            const normalized = phase < 0 ? phase + 1 : phase;
+            const illumination = Math.round((1 - Math.cos(normalized * 2 * Math.PI)) / 2 * 100);
+
+            let phaseName = "Lua Nova";
+            if (normalized >= 0.0625 && normalized < 0.1875) phaseName = "Lua Crescente Côncava";
+            else if (normalized >= 0.1875 && normalized < 0.3125) phaseName = "Quarto Crescente";
+            else if (normalized >= 0.3125 && normalized < 0.4375) phaseName = "Lua Crescente Gibosa";
+            else if (normalized >= 0.4375 && normalized < 0.5625) phaseName = "Lua Cheia";
+            else if (normalized >= 0.5625 && normalized < 0.6875) phaseName = "Lua Minguante Gibosa";
+            else if (normalized >= 0.6875 && normalized < 0.8125) phaseName = "Quarto Minguante";
+            else if (normalized >= 0.8125 && normalized < 0.9375) phaseName = "Lua Minguante Côncava";
+
+            document.getElementById('moon-phase-name').textContent = phaseName;
+            document.getElementById('moon-illumination').textContent = `Iluminação do disco lunar: ${illumination}%`;
+        }
+
+        function generateHealthTips(temp, humidity, rainProb, windSpeed) {
+            const text = document.getElementById('health-tip-text');
+            const tips = [];
+
+            if (humidity <= 30) {
+                tips.push("O ar está muito seco (umidade baixa). Beba bastante água ao longo do dia, umedeça os ambientes e evite desgaste físico intenso entre 10h e 16h.");
+            } else if (humidity < 45 && temp >= 29) {
+                tips.push("Clima quente e seco! Reforce a hidratação constantemente e utilize protetor solar se sair ao ar livre.");
+            }
+            if (temp >= 31) {
+                tips.push("Calor elevado! Prefira roupas leves e claras, mantenha-se hidratado e busque locais frescos e ventilados.");
+            } else if (temp <= 15) {
+                tips.push("Temperatura baixa! Agasalhe-se bem para evitar choques térmicos e proteja as extremidades.");
+            }
+            if (rainProb >= 60) {
+                tips.push("Alta probabilidade de chuva hoje! Leve guarda-chuva ou capa ao sair e redobre o cuidado no trânsito.");
+            }
+            if (windSpeed >= 35) {
+                tips.push("Ventos fortes na região. Evite permanecer embaixo de árvores ou estruturas metálicas instáveis.");
+            }
+            if (tips.length === 0) {
+                tips.push("Condições climáticas equilibradas e agradáveis! Excelente dia para atividades ao ar livre, lembrando sempre de beber água regularmente.");
+            }
+            text.textContent = tips.join(" ");
+        }
+
+        async function fetchWeatherByCoords(lat, lon, displayLocationName, badgeText = "Local Selecionado") {
+            try {
+                if (activeAbortController) activeAbortController.abort();
+                activeAbortController = new AbortController();
+
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FSao_Paulo`;
+                const res = await fetch(url, { signal: activeAbortController.signal });
+                if (!res.ok) throw new Error("Falha ao consultar serviço meteorológico.");
+                const data = await res.json();
+
+                const current = data.current;
+                const daily = data.daily;
+                const todayRainProb = daily.precipitation_probability_max?.[0] ?? 0;
+
+                document.getElementById('location-badge').textContent = badgeText;
+                document.getElementById('city-name').textContent = displayLocationName;
+                document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', {
+                    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                });
+
+                const tempRounded = Math.round(current.temperature_2m);
+                const apparentRounded = Math.round(current.apparent_temperature);
+                const humidity = Math.round(current.relative_humidity_2m);
+                const pressure = Math.round(current.surface_pressure);
+                const wind = Math.round(current.wind_speed_10m);
+
+                document.getElementById('current-temp').textContent = tempRounded;
+                document.getElementById('apparent-temp').textContent = `${apparentRounded}°C`;
+                document.getElementById('current-humidity').textContent = `${humidity}%`;
+                document.getElementById('current-rain-prob').textContent = `${todayRainProb}%`;
+                document.getElementById('current-wind').textContent = `${wind} km/h`;
+                document.getElementById('current-pressure').textContent = `${pressure} hPa`;
+
+                const wInfo = getWeatherInfo(current.weather_code);
+                document.getElementById('weather-desc').textContent = wInfo.desc;
+                document.getElementById('weather-icon-main').innerHTML = `<div style="width:52px;height:52px;">${wInfo.svg}</div>`;
+
+                document.title = `Clima em ${displayLocationName} (${tempRounded}°C) | Previsão 7 Dias - clima.franklem.com`;
+                generateHealthTips(tempRounded, humidity, todayRainProb, wind);
+
+                const forecastContainer = document.getElementById('forecast-list');
+                const fragment = document.createDocumentFragment();
+
+                for (let i = 0; i < daily.time.length && i < 7; i++) {
+                    const dateParts = daily.time[i].split('-');
+                    const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                    const dayLabel = i === 0 
+                        ? 'Hoje' 
+                        : dateObj.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '');
+                    
+                    const dInfo = getWeatherInfo(daily.weather_code[i]);
+                    const minT = Math.round(daily.temperature_2m_min[i]);
+                    const maxT = Math.round(daily.temperature_2m_max[i]);
+                    const rainP = daily.precipitation_probability_max[i] ?? 0;
+
+                    const row = document.createElement('div');
+                    row.className = "forecast-row";
+                    row.innerHTML = `
+                        <div class="f-day">${dayLabel}</div>
+                        <div class="f-cond">
+                            <span style="width:22px;height:22px;display:inline-flex;">${dInfo.svg}</span>
+                            <span class="f-cond-text">${dInfo.desc}</span>
+                        </div>
+                        <div class="f-right">
+                            <span class="f-rain" title="Chance de chuva">☔ ${rainP}%</span>
+                            <div class="f-temps">
+                                <span style="color:var(--text-muted)">${minT}°</span> / <span>${maxT}°C</span>
+                            </div>
+                        </div>
+                    `;
+                    fragment.appendChild(row);
+                }
+
+                forecastContainer.replaceChildren(fragment);
+
+                lastLoadedWeather = {
+                    city: displayLocationName,
+                    temp: tempRounded,
+                    rain: todayRainProb,
+                    humidity: humidity,
+                    desc: wInfo.desc
+                };
+
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showStatus("Erro ao carregar dados meteorológicos. Tente novamente.", true);
+                }
+            }
+        }
+
+        async function handleSearchQuery(rawQuery) {
+            const query = rawQuery.trim();
+            if (!query) return;
+
+            const cleanDigits = query.replace(/\D/g, '');
+            const isCep = cleanDigits.length === 8 && /^[\d-\s]+$/.test(query);
+
+            const searchBtn = document.getElementById('search-btn');
+            searchBtn.textContent = '...';
+            searchBtn.disabled = true;
+
+            try {
+                if (isCep) {
+                    const cepRes = await fetch(`https://brasilapi.com.br/api/cep/v2/${cleanDigits}`);
+                    if (!cepRes.ok) throw new Error("CEP não encontrado no Brasil. Verifique os 8 dígitos.");
+                    const cepData = await cepRes.json();
+                    const cityState = `${cepData.city}, ${cepData.state}`;
+
+                    if (cepData.location?.coordinates?.latitude && cepData.location?.coordinates?.longitude) {
+                        await fetchWeatherByCoords(
+                            cepData.location.coordinates.latitude,
+                            cepData.location.coordinates.longitude,
+                            cityState,
+                            `CEP ${cepData.cep}`
+                        );
+                    } else {
+                        await searchBrazilianCity(cepData.city, cepData.state, `CEP ${cepData.cep}`);
+                    }
+                } else {
+                    await searchBrazilianCity(query);
+                }
+            } catch (error) {
+                showStatus(error.message || "Não foi possível localizar a cidade ou CEP informado.", true);
+            } finally {
+                searchBtn.textContent = 'Buscar';
+                searchBtn.disabled = false;
+            }
+        }
+
+        async function searchBrazilianCity(cityName, filterState = null, customBadge = "Cidade Pesquisada (Brasil)") {
+            const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=5&language=pt&format=json&countryCode=BR`;
+            const res = await fetch(geoUrl);
+            const data = await res.json();
+
+            if (!data.results || data.results.length === 0) {
+                throw new Error(`Nenhuma cidade brasileira encontrada para "${cityName}".`);
+            }
+
+            let chosen = data.results[0];
+            if (filterState) {
+                const match = data.results.find(r => r.admin1 && r.admin1.toLowerCase().includes(filterState.toLowerCase()));
+                if (match) chosen = match;
+            }
+
+            const stateName = chosen.admin1 ? `, ${chosen.admin1}` : '';
+            await fetchWeatherByCoords(chosen.latitude, chosen.longitude, `${chosen.name}${stateName}`, customBadge);
+        }
+
+        function quickSearch(term) {
+            document.getElementById('search-input').value = term;
+            handleSearchQuery(term);
+        }
+
+        function detectUserLocation(forceGps = false) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryParam = urlParams.get('q') || urlParams.get('cidade');
+
+            if (queryParam && !forceGps) {
+                document.getElementById('search-input').value = queryParam;
+                handleSearchQuery(queryParam);
+                return;
+            }
+
+            fetchWeatherByCoords(-21.1775, -47.8103, "Ribeirão Preto, SP", "Local Inicial (Brasil)");
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    async (pos) => {
+                        const lat = pos.coords.latitude;
+                        const lon = pos.coords.longitude;
+                        try {
+                            const revRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=pt`);
+                            const revData = await revRes.json();
+                            const city = revData.city || revData.locality || "Sua Localização";
+                            const state = revData.principalSubdivisionCode ? revData.principalSubdivisionCode.replace('BR-', '') : 'BR';
+                            await fetchWeatherByCoords(lat, lon, `${city}, ${state}`, "Localização Atual (GPS)");
+                        } catch {
+                            await fetchWeatherByCoords(lat, lon, "Sua Localização Atual", "Localização Atual (GPS)");
+                        }
+                    },
+                    () => {},
+                    { timeout: 6000 }
+                );
+            }
+        }
+
+        // Carrega o iframe do blog apenas quando o usuário rolar até perto dele ou após 3.5s (protege o LCP e Speed Index no Mobile)
+        function initDeferredBlogIframe() {
+            let loaded = false;
+            const loadIframe = () => {
+                if (loaded) return;
+                loaded = true;
+                const container = document.getElementById('blog-container');
+                if (!container) return;
+                container.innerHTML = `<iframe src="https://blog.franklem.com" title="Blog de Notícias por Franklin Martins (blog.franklem.com)" width="100%" height="420" style="border:0;width:100%;height:100%;" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>`;
+            };
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting) {
+                        loadIframe();
+                        observer.disconnect();
+                    }
+                }, { rootMargin: '250px' });
+                observer.observe(document.getElementById('blog-container'));
+            } else {
+                setTimeout(loadIframe, 3500);
+            }
+        }
+
+        document.getElementById('search-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleSearchQuery(document.getElementById('search-input').value);
+        });
+
+        document.getElementById('btn-geo').addEventListener('click', () => {
+            detectUserLocation(true);
+        });
+
+        document.getElementById('btn-share').addEventListener('click', () => {
+            const tip = document.getElementById('health-tip-text').textContent;
+            const cityQueryUrl = `${APP_BASE_URL}/?q=${encodeURIComponent(lastLoadedWeather.city)}`;
+            const shareText = `🌤️ *Clima em ${lastLoadedWeather.city}*: ${lastLoadedWeather.temp}°C (${lastLoadedWeather.desc}) | ☔ Chuva: ${lastLoadedWeather.rain}% | 💧 Umidade: ${lastLoadedWeather.humidity}%.\n💡 *Dica de Saúde:* ${tip}\n\n📍 Veja a previsão de 7 dias em: ${cityQueryUrl}\nDesenvolvido por Franklin Martins (https://franklem.com)`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            calculateMoonPhase();
+            detectUserLocation();
+            initDeferredBlogIframe();
+        });
+    </script>
+</body>
+</html>
